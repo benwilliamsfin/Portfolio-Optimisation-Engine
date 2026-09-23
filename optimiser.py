@@ -19,8 +19,10 @@ tickers = ['SPY', 'TLT', 'GLD', 'QQQ']
 
 start_date = "2021-01-01"
 end_date = "2026-01-01"
-# Select a 5-year histrorical timeframe to capture macroeconomic trends, in particular post-covid recovery period
+# 5-Year histrorical timeframe to capture macroeconomic trends, in particular post-covid recovery period
 # rate hiking cycles, and subsequent inflation/tech market cycles
+# This 5-year window serves as a macro stress-test regime. Historical mean returns are used as an empirical baseline proxy, 
+# acknowledging the classic out-of-sample estimation noise inherent in backward-looking expected returns.
 
 print("Fetching Historical Asset Data")
 data = yf.download(tickers, start=start_date, end=end_date, auto_adjust=False)['Adj Close']
@@ -50,6 +52,8 @@ mean_returns = returns.mean() * 252
 # daily covariance by 252. This matrix models both individual asset variances and
 # cross-asset co-movement required for Markowitz risk modelling.
 cov_matrix = returns.cov() * 252
+# Standard Markowitz assumes covariance stationarity over the period. 
+# In live markets, cross-asset correlations are dynamic and tend toward 1.0 during liquidity shocks.
 
 # Verification
 print("\nData Ingestion and Covariance Verification")
@@ -57,3 +61,35 @@ print("\nAnnualised Mean Returns")
 print(mean_returns)
 print ("\nCovariance Matrix (Assets x Assets)", cov_matrix.shape)
 #\n drops a line prior to printing text, purely visual clarity
+
+
+# Step 3 - Implementation 
+# Simulating portfolios using a standard python for-loop. 
+
+import time 
+
+num_portfolios_loop = 10_000
+loop_returns = []
+loop_volatilities = []
+loop_sharpes = []
+
+print(f"\n[BENCHMARK] Executing simulation across {num_portfolios_loop:,} portfolios")
+start_time = time.time()
+
+for i in range (num_portfolios_loop):
+    # Generate random weights
+    w = np.random.random(len(tickers))
+    w /= np.sum(w)
+
+    # Compute return and volatility
+    ret = np.dot(w, mean_returns)
+    vol = np.sqrt(np.dot(w.T, np.dot(cov_matrix, w)))
+    sharpe = ret/vol 
+
+    loop_returns.append(ret)
+    loop_volatilities.append(vol)
+    loop_sharpes.append(sharpe)
+
+loop_duration = time.time() - start_time
+print(f"Iterative Loop Finished in: {loop_duration:.4f} seconds for {num_portfolios_loop:,} portfolios.")
+print("DESIGN FLAW IDENTIFIED: Iterative overhead scales poorly. Scaling to 1,000,000+ portfolios or adding complex constraints makes this unviable for production systems.")
