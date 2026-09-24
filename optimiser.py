@@ -107,6 +107,7 @@ for i in range (num_portfolios_loop):
 
 loop_duration = time.time() - start_time
 print(f"Iterative Loop Finished in: {loop_duration:.4f} seconds for {num_portfolios_loop:,} portfolios.")
+# .4f formats the float to 4 decimal places for readability.
 # When ran, this takes ~ 1.7 seconds for 10,000 portfolios on my cpu (i7 6700). 
 # This is a reasonable benchmark for a single-threaded python implementation, but the iterative overhead scales poorly. 
 # Scaling to 1,000,000+ portfolios or adding complex constraints makes this unviable for production systems.
@@ -162,3 +163,61 @@ print(f"Vectorised Simulation Finished in: {vector_duration:.4f} seconds for {nu
     # = 0.00017 seconds per portfolio
 # Vectorised Simulation: 0.1181 seconds for 1,000,000 portfolios
     # = 0.0000001181 seconds per portfolio
+
+# Step 5 - Portfolio Optimization
+# From the vectorised simulation, we can now locate the two optimal portfolios: 
+# The Maximum Sharpe ratio portfolio and the Minimum Volatility portfolio.
+
+max_sharpe_idx = np.argmax(portfolio_sharpe)
+# np.argmax(portfolio_sharpe) returns the single integer index corresponding to the maximum Sharpe ratio in the portfolio_sharpe array.
+
+min_volatility_idx = np.argmin(portfolio_volatilities)
+# np.argmin(portfolio_volatilities) returns the single integer index corresponding to the 
+# minimum volatility in the portfolio_volatilities array.
+
+max_sharpe_weights = w_matrix[max_sharpe_idx]
+# np.argmax(portfolio_sharpe) returns the index of the maximum Sharpe ratio, and we use this index to 
+# extract the corresponding weights from the w_matrix.
+
+# Now, we can extract the optimal weights for each of these portfolios using the indices we just computed.
+max_sharpe_ret = portfolio_returns[max_sharpe_idx]
+max_sharpe_vol = portfolio_volatilities[max_sharpe_idx]
+max_sharpe_val = portfolio_sharpe[max_sharpe_idx]
+
+# Repeat the same process for the minimum volatility portfolio.
+
+min_volatility_weights = w_matrix[min_volatility_idx]
+min_volatility_ret = portfolio_returns[min_volatility_idx]
+min_volatility_vol = portfolio_volatilities[min_volatility_idx]
+min_volatility_val = portfolio_sharpe[min_volatility_idx]
+
+print("\n" + "="*50)
+print("OPTIMAL PORTFOLIO ALLOCATIONS (1,000,000 PORTFOLIOS SIMULATED)")
+print("="*50)
+# Print a separator line for visual clarity
+
+# Display Maxium Sharpe Ratio Portfolio
+print("\nMaximum Sharpe Ratio Portfolio")
+print(f"Return = {max_sharpe_ret * 100:.2f}%")
+print(f"Volatility = {max_sharpe_vol * 100:.2f}%")
+print(f"Sharpe Ratio = {max_sharpe_val:.4f}")
+print("Asset Allocation:")
+
+for ticker, weight in zip(tickers, max_sharpe_weights):
+    print(f"{ticker}: {weight * 100:6.2f}%")
+# zip(tickers, max_sharpe_weights) pairs each ticker with its corresponding weight in the maximum Sharpe ratio portfolio,
+# allowing us to iterate over both simultaneously and print the asset allocation in a readable format.
+# {weight * 100:6.2f}% formats the weight as a percentage with 2 decimal places, ensuring consistent alignment in the output.
+
+# Display Minimum Volatility Portfolio
+print("\nMinimum Volatility Portfolio")
+print(f"Return = {min_volatility_ret * 100:.2f}%")
+print(f"Volatility = {min_volatility_vol * 100:.2f}%")
+print(f"Sharpe Ratio = {min_volatility_val:.4f}")
+print("Asset Allocation:")
+
+for ticker, weight in zip(tickers, min_volatility_weights):
+    print(f"{ticker}: {weight * 100:6.2f}%")
+
+print("\n" + "="*50)
+
