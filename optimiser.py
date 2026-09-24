@@ -221,3 +221,46 @@ for ticker, weight in zip(tickers, min_volatility_weights):
 
 print("\n" + "="*50)
 
+# ==================================================
+# OPTIMAL PORTFOLIO ALLOCATIONS (1,000,000 PORTFOLIOS SIMULATED)
+# ==================================================
+
+# Maximum Sharpe Ratio Portfolio
+# Return = 16.18%
+# Volatility = 12.30%
+# Sharpe Ratio = 1.3157
+# Asset Allocation:
+# SPY:  60.00%
+# TLT:   0.88%
+# GLD:  39.07%
+# QQQ:   0.05%
+
+# Minimum Volatility Portfolio
+# Return = 8.19%
+# Volatility = 10.63%
+# Sharpe Ratio = 0.7706
+# Asset Allocation:
+# SPY:  33.69%
+# TLT:   0.01%
+# GLD:  32.97%
+# QQQ:  33.34%
+
+# ==============================================================================
+# EMPIRICAL ANALYSIS & MACRO REGIME TAKEAWAYS (2021-2026 WINDOW):
+# 
+# 1. Max Sharpe Portfolio (SPY ~60%, GLD ~39%, TLT <1%, QQQ <1%):
+#    - SPY + GLD dominance: Combining equity market beta with an uncorrelated real asset 
+#      maximises diversification benefits in the Markowitz quadratic form (w^T * Sigma * w),
+#      yielding the highest risk-adjusted excess return per unit of volatility.
+#    - QQQ exclusion: High correlation with SPY (>0.90) paired with higher distinctive 
+#      volatility penalises QQQ; the optimiser favours the lower-volatility equity vehicle.
+#    - TLT suppression: Persistent rate-hiking cycles created severe duration 
+#      drag, resulting in sluggish 5-year returns that degraded its risk-adjusted attractiveness.
+#
+# 2. Min Volatility Portfolio (SPY ~34%, GLD ~33%, QQQ ~33%, TLT <1%):
+#    - Diversification floor: Spreading capital across equities and real assets dampens 
+#      unsystematic risk to the minimum achievable volatility (~10.63%).
+#    - Frontier trade-off: Shaving ~1.67% of volatility requires sacrificing ~8% in annual 
+#      return, reducing the Sharpe Ratio from 1.32 to 0.77.
+# ==============================================================================
+
